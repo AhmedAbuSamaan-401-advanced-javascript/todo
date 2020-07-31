@@ -1,20 +1,38 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import ListGroup from 'react-bootstrap/ListGroup';
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
+import Badge from 'react-bootstrap/Badge';
+import './style.scss';
+import { ToggleContext } from '../context/hideShow';
+import { PaginationContext }  from '../context/pagination-context';
+function TodoList (props){
 
-function TodoList(props) {
-  if (props.list.list) {
-    return (
-      <ul>
-        {props.list.list.map(item => (
-          <li className={`complete-${item.complete.toString()}`}key={item._id}>
-            <span onClick={() => props.handleComplete(item._id)}>{item.text}</span>
-          </li>))}
-      </ul>
-    );
-  }
-  else {
-    return (
-      null
-    );
-  }
+  const toggleContext = useContext(ToggleContext);
+  const pagination = useContext(PaginationContext);
+  return (
+
+    <ListGroup>
+      {pagination.currentItem.map(item => (
+        <Card 
+          className={`complete-${item.complete} complete-${item.complete}-${toggleContext.status} card`}
+          key={item._id} 
+        >
+          <Card.Header>
+            <Badge className={`status status-${item.complete}`}  variant="success">{item.complete}</Badge>{' '} {item.assignee}
+            <Button variant="light" className='delete' onClick={() => props.handleDelete(item._id)}>X</Button></Card.Header>
+          <Card.Text onClick={() => props.handleComplete(item._id)}>
+            <span>{item.text}</span>
+            <span>{item.difficulty }</span>
+          </Card.Text>
+                
+                
+               
+        </Card>
+      ))}
+    </ListGroup>
+  );
 }
+
+
 export default TodoList;

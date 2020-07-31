@@ -1,27 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import TodoForm from './form.js';
 import TodoList from './list.js';
-import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
+
 import './todo.scss';
 
-function ToDo (props){
-  let [list, setList]=  useState([]);
+function ToDo(props){
 
-  function addItem(item){
+  const [list,setList] = useState([]);
+  const   addItem = (item) => {
     item._id = Math.random();
     item.complete = false;
-    setList({list:[...list.list, item]});
-  }
+    setList([...list, item]);
+    // console.log('jjjjjjjjj',list);
+  
+  };
 
-  function toggleComplete(id){
-    let item = list.list.filter(i => i._id === id)[0] || {};
+  const toggleComplete = id => {
+
+    let item =list.filter(i => i._id === id)[0] || {};
+
     if (item._id) {
       item.complete = !item.complete;
-      let list1 = list.list.map(listItem => listItem._id === item._id ? item : listItem);
-      setList({list:list1});
+      let list1 = list.map(listItem => listItem._id === item._id ? item : listItem);
+      setList(list1);
     }
-  }
+
+  };
 
   useEffect(() => {
     let list = [
@@ -31,49 +36,38 @@ function ToDo (props){
       { _id: 4, complete: true, text: 'Do Homework', difficulty: 3, assignee: 'Person C'},
       { _id: 5, complete: false, text: 'Take a Nap', difficulty: 1, assignee: 'Person B'},
     ];
-
-    setList({list});
-
+    setList(list);
   }, []);
 
-  if (list.list){
-    return (
-          
-      <>
+ 
+  return (
+    <>
+      <Navbar bg="primary" variant="light">
         <header>
-          <Navbar bg="primary" variant="dark">
-            <Nav className="mr-auto">
-              <Nav.Link href="#home">Home</Nav.Link>
-            </Nav>
-            <br></br>
-          </Navbar>
-          {/* <h2> */}
-          <br />
-
-          <Navbar bg="dark" variant="dark">
-            <Navbar.Brand href="#home" id="ListManger"> To Do List Manager {list.list.filter(item => !item.complete).length}</Navbar.Brand>
-          </Navbar>
-              
-          {/* </h2> */}
+          <h2>
+          There are {list.filter(item => !item.complete).length} Items To Complete
+          </h2>
         </header>
-    
-        <section className="todo">
-    
-          <div>
-            <TodoForm handleSubmit={addItem} />
-          </div>
-    
-          <div>
-            <TodoList
-              list={list}
-              handleComplete={toggleComplete}
-            />
-          </div>
-        </section>
-      </>
+      </Navbar>
+
+      <section className="todo">
+
+        <div>
+          <TodoForm handleSubmit={addItem} />
+        </div>
+
+        <div>
+          <TodoList
+            list={list}
+            handleComplete={toggleComplete}
+          />
+        </div>
+      </section>
+    </>
+  );
   
-    );
-  }else {return null}
 }
+
+
 
 export default ToDo;
