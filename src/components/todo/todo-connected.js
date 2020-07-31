@@ -1,74 +1,63 @@
 import React, { useEffect, useState } from 'react';
 import TodoForm from './form.js';
 import TodoList from './list.js';
-
+import useAjax from '../hooks/useAjax';
 import './todo.scss';
+import Navbar from 'react-bootstrap/Navbar';
+import Nav from 'react-bootstrap/Nav';
+import Pagination from './pagination.js';
+import ToggleHideShow from './togglehideshow';
+import PaginationContext from '../context/pagination-context';
+import ToggleShowProvider from '../context/hideShow';
+import ChangeNumberOfPages from './itemperpage';
+import Header from '../header/header.js';
 
-const todoAPI = 'https://api-js401.herokuapp.com/api/v1/todo';
+
 const ToDo = () => {
-  const [list, setList] = useState([]);
-  const _addItem = (item) => {
-    item.due = new Date();
-    fetch(todoAPI, {
-      method: 'post',
-      mode: 'cors',
-      cache: 'no-cache',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(item),
-    })
-      .then(response => response.json())
-      .then(savedItem => {
-        setList([...list, savedItem]);
-      })
-      .catch(console.error);
-  };
+  const [list ,_addItem , _toggleComplete , _getTodoItems , deleteItem] = useAjax();
 
-  const _toggleComplete = id => {
-    let item = list.filter(i => i._id === id)[0] || {};
-    if (item._id) {
-      item.complete = !item.complete;
-      let url = `${todoAPI}/${id}`;
-      fetch(url, {
-        method: 'put',
-        mode: 'cors',
-        cache: 'no-cache',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(item),
-      })
-        .then(response => response.json())
-        .then(savedItem => {
-          setList(list.map(listItem => listItem._id === item._id ? savedItem : listItem));
-        })
-        .catch(console.error);
-    }
-  };
-
-  const _getTodoItems = () => {
-    fetch(todoAPI, {
-      method: 'get',
-      mode: 'cors',
-    })
-      .then(data => data.json())
-      .then(data => setList(data.results))
-      .catch(console.error);
-  };
 
   useEffect(_getTodoItems, []);
 
   return (
     <>
-      <header>
-        <h2>
-          There are {list.filter(item => !item.complete).length} Items To Complete
-        </h2>
-      </header>
+      <Header/>
+      <Navbar bg="dark" variant="dark" className="navSec">
+    
+        <Nav className="mr-auto" >
+          <h2>
+          To Do List Manager ({list.filter(item => item.complete === 'pending').length}) 
+          </h2>
+        </Nav>
+
+      </Navbar>
+
+
+
       <section className="todo">
-        <div>
+
+        <div className="form">
           <TodoForm handleSubmit={_addItem} />
         </div>
-        <div>
-          <TodoList list={list} handleComplete={_toggleComplete}/>
-        </div>
+        <PaginationContext list={list}>
+
+          <div className="list">
+            <ToggleShowProvider list={list}>
+              <ToggleHideShow/>
+              <ChangeNumberOfPages/>
+          
+              <TodoList
+                handleComplete={_toggleComplete}
+                handleDelete={deleteItem}
+              />
+            </ToggleShowProvider>
+            <Pagination
+              totalitems={list.length}
+            />
+          </div>
+
+        </PaginationContext>
+
       </section>
     </>
   );

@@ -1,8 +1,7 @@
 import React from 'react';
-// import Auth from './components/todo/auth/index';
-// import Login from './components/todo/login/index';
-// import LoginProvider from './context/auth';
-import ToDo from './components/todo/todo.js';
+
+// import ToDo from './components/todo/todo.js';
+import ToDo from './components/todo/todo-connected';
 
 export default class App extends React.Component {
   render() {
